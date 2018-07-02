@@ -3,14 +3,14 @@
 import rospy, copy
 from geometry_msgs.msg import Twist
 from std_srvs.srv import Trigger, TriggerResponse
-from pimouse_ros.msg import LightSensorValue
+from pimouse_ros.msg import lightsensorvalues
 
 class WallStop():
     def __init__(self):
-        self.sub_cmd_vel = rospy.Subscriber('/cmd_vel', Twist, queue_size=1)
+        self.cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
 
-        self.sensor_values = LightSensorValues()
-        rospy.Subscriber('/lightsensors',LightSensorValues, self.callback)
+        self.sensor_values = lightsensorvalues()
+        rospy.Subscriber('/lightsensors',lightsensorvalues, self.callback)
 
     def callback(self,messages):
         self.sensor_values = messages
