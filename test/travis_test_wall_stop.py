@@ -6,11 +6,11 @@ import time
 class WallStopTest(unittest,TestCase):
     def set_and_get(self,lf,ls,rs,rf):
         with open("/dev/rtlightsensor0","w") as f:
-            f.write("%d %d %d %d\n" % (rf,rd,ld,lf))
+            f.write("%d %d %d %d\n" % (rf,rs,ls,lf))
 
         time.sleep(0.3)
 
-        with open("/dev/rtmotor_raw_10","r") as lf, open("/dev/rtmotor_raw_0","r") as rf:
+        with open("/dev/rtmotor_raw_l0","r") as lf, open("/dev/rtmotor_raw_r0","r") as rf:
             left = int(lf.readline().rstrip())
             right = int(rf.readline().rstrip())
 
