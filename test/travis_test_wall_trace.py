@@ -8,7 +8,7 @@ class WallStopTest(unittest.TestCase):
         with open("/dev/rtlightsensor0","w") as f:
             f.write("%d %d %d %d\n" % (rf,rs,ls,lf))
 
-        time.sleep(0.3)
+        time.sleep(1.0)
 
         with open("/dev/rtmotor_raw_l0","r") as lf, open("/dev/rtmotor_raw_r0","r") as rf:
             left = int(lf.readline().rstrip())
@@ -23,7 +23,7 @@ class WallStopTest(unittest.TestCase):
         left, right = self.set_and_get(0,5,1000,0) #side direction is not a trigger of stop
         self.assertTrue(left == right != 0,"stop wrongly by side sensors")
 
-        left, right = self.set_and_get(0,100,0,0) #curve to left
+        left, right = self.set_and_get(0,50,0,0) #curve to left
         self.assertTrue(left < right,"don't curve to left")
 
         left, right = self.set_and_get(0,400,0,0) #curve to right
@@ -35,5 +35,5 @@ class WallStopTest(unittest.TestCase):
 if __name__ == '__main__':
     time.sleep(3)
     rospy.init_node('travis_test_wall_trace')
-    rostest.rosrun('pimouse_run_corridor','travis_test_wall_trace',WallStopTest)
+    rostest.rosrun('pimouse_run_corridor','travis_test_wall_trace',WallTraceTest)
 
