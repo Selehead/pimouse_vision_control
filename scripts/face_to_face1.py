@@ -1,54 +1,33 @@
 #!/usr/bin/env python
 #encoding: utf8
-import rospy, copy, math
-from geometry_msgs.msg import Twist
-from std_srvs.srv import Trigger, TriggerResponse
-from pimouse_ros.msg import LightSensorValues
+import rospy, cv2
+from sensor_msgs.msg import Image
+from cv_bridgev import Cvbridge,CvBriddgeError
 
-class WallAround():
+class FaceToFace():
     def __init__(self):
-        self.cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
-
-        self.sensor_values = LightSensorValues()
-        rospy.Subscriber('/lightsensors',LightSensorValues, self.callback)
-
-    def callback(self,messages):
-        self.sensor_values = messages
-
-    def wall_front(self,ls):
-        return ls.left_forward > 100 or ls.right_forward > 100
-
-    def too_right(self,ls):
-        return ls.right_side > 300
-
-    def too_left(self,ls):
-        return ls.left_side > 300
-
-    def run(self):
-        rate = rospy.Rate(10)
-        data = Twist()
-
-        data.linear.x = 0.2
-        data.angular.z = 0.0
-        while not rospy.is_shutdown():
-            if self.wall_front(self.sensor_values):
-                data.angular.z = - math.pi
-            elif self.too_right(self.sensor_values):
-                data.angular.z = math.pi
-            elif self.too_left(self.sensor_values):
-                data.angular.z = - math.pi
-            else:
-                e = 50 - self.sensor_values.left_side
-                data.angular.z = e * math.pi / 180.0
-
-            self.cmd_vel.publish(data)
-            rate.sleep()
+        sub = rospy.Subscriber('/cv_camera/image_raw', Image, self.get_image)
+        self.bridge = CvBridge()
+        self.image_org = None
+      
+    def gte_image(self,img):
+        try:
+            self.image_org = self.bridge.imgmsg_to_cv2(img, "bgr8")
+        except CvBridgeError as e:
+            rospy.logerr(e)
+            
+    def detect_face(self):
+        if self.image_org is None:
+            return None
+        
+        return id(self.image_org), type(self.image_org), self.image_org.shape
 
 if __name__ == "__main__":
-    rospy.init_node('wall_stop')
-    rospy.wait_for_service('/motor_on')
-    rospy.wait_for_service('/motor_off')
-    rospy.on_shutdown(rospy.ServiceProxy('/motor_off',Trigger).call)
-    rospy.ServiceProxy('/motor_on',Trigger).call()
-    WallAround().run()
+    rospy.init_node('face_to_face')
+    fd = faceToFace()
+    
+   rate = rospy.Rate(10)
+    while not rospy.is_shutdown():
+        rospy.loginfo(fd.detect_face())
+        rate.sleep()
 
