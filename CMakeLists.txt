@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(pimouse_run_corridor)
+project(pimouse_vision_control)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -13,6 +13,9 @@ find_package(catkin REQUIRED COMPONENTS
   std_srvs
   actionlib_msgs
   message_generation
+  sensor_msgs
+  cv_bridge
+  pimouse_ros
 )
 
 ## System dependencies are found with CMake's conventions
@@ -72,6 +75,7 @@ generate_messages(
    DEPENDENCIES
    actionlib_msgs
    std_msgs
+   sensor_msgs
 )
 
 ################################################
